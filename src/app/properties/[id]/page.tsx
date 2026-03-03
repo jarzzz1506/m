@@ -22,6 +22,8 @@ interface Property {
   location: string;
   area: string;
   city: string;
+  unit_no: string | null;
+  tower: string | null;
   bedrooms: number;
   bathrooms: number;
   area_sqft: number;
@@ -155,7 +157,12 @@ export default function PropertyDetailPage() {
             <h1 className="text-2xl font-bold text-foreground">
               {property.title}
             </h1>
-            <p className="text-muted mt-1">{property.location}</p>
+            <p className="text-muted mt-1">
+              {property.unit_no && <span className="font-mono font-medium text-foreground">Unit {property.unit_no}</span>}
+              {property.unit_no && property.tower && <span> &bull; </span>}
+              {property.tower && <span>{property.tower} &bull; </span>}
+              {property.location}
+            </p>
             <div className="flex flex-wrap items-center gap-3 mt-3">
               <span
                 className={`inline-block px-2.5 py-1 rounded text-xs font-medium ${

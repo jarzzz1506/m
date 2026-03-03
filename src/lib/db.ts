@@ -39,6 +39,8 @@ function initSchema(db: Database.Database) {
       listing_type TEXT NOT NULL CHECK(listing_type IN ('rent', 'sale')),
       current_price REAL NOT NULL,
       currency TEXT NOT NULL DEFAULT 'AED',
+      unit_no TEXT,
+      tower TEXT,
       image_url TEXT,
       first_seen_at TEXT NOT NULL DEFAULT (datetime('now')),
       last_updated_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -107,8 +109,8 @@ function seedIfEmpty(db: Database.Database) {
   const rentListings = generateListings(areas, propertyTypes, "rent", 60);
 
   const insertProperty = db.prepare(`
-    INSERT INTO properties (external_id, url, title, location, area, city, bedrooms, bathrooms, area_sqft, property_type, listing_type, current_price, currency, first_seen_at, last_updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'AED', ?, datetime('now'))
+    INSERT INTO properties (external_id, url, title, location, area, city, bedrooms, bathrooms, area_sqft, property_type, listing_type, current_price, currency, unit_no, tower, first_seen_at, last_updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'AED', ?, ?, ?, datetime('now'))
   `);
 
   const insertSnapshot = db.prepare(`
@@ -136,6 +138,8 @@ function seedIfEmpty(db: Database.Database) {
         listing.propertyType,
         listing.listingType,
         listing.currentPrice,
+        listing.unitNo,
+        listing.tower,
         listing.firstSeenAt
       );
 
@@ -169,6 +173,8 @@ interface SeedListing {
   title: string;
   location: string;
   area: string;
+  unitNo: string;
+  tower: string;
   bedrooms: number;
   bathrooms: number;
   areaSqft: number;
@@ -186,6 +192,41 @@ interface SeedListing {
   }[];
 }
 
+const TOWERS: Record<string, string[]> = {
+  "Dubai Marina": ["Marina Gate 1", "Marina Gate 2", "Cayan Tower", "Princess Tower", "Damac Heights", "Marina Crown", "The Torch", "Botanica Tower", "Marina Pinnacle", "Silverene Tower"],
+  "Downtown Dubai": ["Burj Khalifa", "Boulevard Point", "The Address", "Claren Tower 1", "Claren Tower 2", "Act One Act Two", "Forte Tower", "Mon Reve", "Bellevue Tower 1", "The Residences"],
+  "Palm Jumeirah": ["Oceana Pacific", "Oceana Atlantic", "Tiara Residences", "Shoreline Apartments", "Golden Mile", "Azure Residences", "Marina Residences", "Fairmont North", "Fairmont South"],
+  "JBR": ["Sadaf 1", "Sadaf 2", "Murjan 1", "Murjan 2", "Bahar 1", "Bahar 2", "Shams 1", "Shams 2", "Amwaj 1", "Amwaj 2"],
+  "Business Bay": ["Executive Tower B", "Executive Tower H", "Bay Gate", "The Opus", "Damac Maison", "Capital Bay Tower A", "Capital Bay Tower B", "Ubora Tower 1", "The Binary Tower", "Clover Bay Tower"],
+  "Arabian Ranches": ["Al Reem", "Palmera", "Savannah", "Alma", "Rosa", "Lila", "Saheel", "Hattan"],
+  "Dubai Hills Estate": ["Park Heights 1", "Park Heights 2", "Collective Tower 1", "Collective Tower 2", "Acacia", "Elora", "Golf Suites"],
+  "Jumeirah Village Circle": ["Bloom Towers", "Belgravia Square", "Pantheon Elysee", "Oxford Residences", "Hyati Residences", "Ghalia", "Le Grand Chateau"],
+  "Dubai Creek Harbour": ["Creek Gate Tower 1", "Creek Gate Tower 2", "Creek Rise", "Harbour Gate Tower 1", "Harbour Gate Tower 2", "Creek Edge Tower 1", "The Cove"],
+  "DIFC": ["Index Tower", "Central Park Tower", "Park Tower A", "Park Tower B", "Liberty House", "Sky Gardens", "Gate Village"],
+  "Jumeirah Lake Towers": ["Cluster A", "Cluster D", "Cluster E", "Cluster R", "Lake Shore Tower", "Saba Tower 1", "Saba Tower 2", "Goldcrest Executive", "Icon Tower 1"],
+  "Al Barsha": ["Al Barsha Business Centre", "Sama Tower", "Majestic Tower", "Elite Residence"],
+  "Motor City": ["Fox Hill", "Green Community", "Bennett House", "Sherlock House", "Dickens Circus"],
+  "Dubai Silicon Oasis": ["Silicon Heights", "Le Presidium", "Palace Tower", "Axis Silver", "Axis Residence"],
+  "Town Square": ["Zahra Apartments", "Safi Apartments", "Hayat Boulevard", "Rawda Apartments", "Naseem Apartments"],
+};
+
+function genTower(area: string, propType: string, rng: () => number): string {
+  if (propType === "Villa" || propType === "Townhouse") {
+    const communities = TOWERS[area] ?? ["Community"];
+    return communities[Math.floor(rng() * communities.length)];
+  }
+  const towers = TOWERS[area] ?? ["Tower 1"];
+  return towers[Math.floor(rng() * towers.length)];
+}
+
+function genUnitNo(propType: string, rng: () => number): string {
+  if (propType === "Villa") return "V" + String(100 + Math.floor(rng() * 900));
+  if (propType === "Townhouse") return "TH-" + String(10 + Math.floor(rng() * 90));
+  const floor = Math.floor(rng() * 45) + 1;
+  const unit = Math.floor(rng() * 12) + 1;
+  return String(floor) + String(unit).padStart(2, "0");
+}
+
 function generateListings(
   areas: string[],
   propertyTypes: string[],
@@ -198,6 +239,8 @@ function generateListings(
   for (let i = 0; i < count; i++) {
     const area = areas[Math.floor(rng() * areas.length)];
     const propType = propertyTypes[Math.floor(rng() * propertyTypes.length)];
+    const unitNo = genUnitNo(propType, rng);
+    const tower = genTower(area, propType, rng);
     const bedrooms =
       propType === "Studio" ? 0 : Math.floor(rng() * 5) + 1;
     const bathrooms = Math.max(1, bedrooms);
@@ -257,9 +300,11 @@ function generateListings(
     listings.push({
       externalId: `pf-${listingType}-${i}-${slug}`,
       url: `https://www.propertyfinder.ae/en/plp/${listingType}/${slug}/property-${i}.html`,
-      title: `${bedrooms === 0 ? "Studio" : bedrooms + " BR"} ${propType} in ${area}`,
-      location: `${area}, Dubai`,
+      title: `${bedrooms === 0 ? "Studio" : bedrooms + " BR"} ${propType} in ${tower}, ${area}`,
+      location: `${tower}, ${area}, Dubai`,
       area,
+      unitNo,
+      tower,
       bedrooms,
       bathrooms,
       areaSqft,

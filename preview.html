@@ -184,7 +184,7 @@ select:focus,input:focus{border-color:var(--primary)}
   <div class="table-card">
     <div class="table-header"><h3>Recent Price Changes</h3></div>
     <table>
-      <thead><tr><th>Property</th><th>Unit</th><th>Area</th><th>Type</th><th class="text-right">Old Price</th><th class="text-right">New Price</th><th class="text-right">Change</th><th class="text-right">When</th></tr></thead>
+      <thead><tr><th>Property</th><th>Unit</th><th>Tower</th><th>Area</th><th>Type</th><th class="text-right">Old Price</th><th class="text-right">New Price</th><th class="text-right">Change</th><th class="text-right">When</th></tr></thead>
       <tbody id="recent-changes-body"></tbody>
     </table>
   </div>
@@ -233,7 +233,7 @@ select:focus,input:focus{border-color:var(--primary)}
   <div class="table-card">
     <table>
       <thead><tr>
-        <th>Property</th><th>Unit</th><th>Area</th><th>Type</th><th>Beds</th>
+        <th>Property</th><th>Unit</th><th>Tower</th><th>Area</th><th>Type</th><th>Beds</th>
         <th class="text-right" style="cursor:pointer" onclick="sortProperties('area_sqft')">Size</th>
         <th class="text-right" style="cursor:pointer" onclick="sortProperties('price')">Price</th>
         <th class="text-right">Change</th>
@@ -321,6 +321,7 @@ const COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6
 
 const AREAS=["Dubai Marina","Downtown Dubai","Palm Jumeirah","JBR","Business Bay","Arabian Ranches","Dubai Hills Estate","Jumeirah Village Circle","Dubai Creek Harbour","DIFC","Jumeirah Lake Towers","Al Barsha","Motor City","Dubai Silicon Oasis","Town Square"];
 const PROP_TYPES=["Apartment","Villa","Townhouse","Penthouse","Studio"];
+const TOWERS={"Dubai Marina":["Marina Gate 1","Marina Gate 2","Cayan Tower","Princess Tower","Damac Heights","Marina Crown","The Torch","Botanica Tower"],"Downtown Dubai":["Burj Khalifa","Boulevard Point","The Address","Claren Tower 1","Act One Act Two","Forte Tower","Mon Reve"],"Palm Jumeirah":["Oceana Pacific","Oceana Atlantic","Tiara Residences","Shoreline Apartments","Golden Mile","Azure Residences"],"JBR":["Sadaf 1","Sadaf 2","Murjan 1","Murjan 2","Bahar 1","Shams 1","Amwaj 1"],"Business Bay":["Executive Tower B","Executive Tower H","Bay Gate","The Opus","Damac Maison","Capital Bay Tower A"],"Arabian Ranches":["Al Reem","Palmera","Savannah","Alma","Rosa","Lila"],"Dubai Hills Estate":["Park Heights 1","Park Heights 2","Collective Tower 1","Acacia","Elora","Golf Suites"],"Jumeirah Village Circle":["Bloom Towers","Belgravia Square","Pantheon Elysee","Oxford Residences","Hyati Residences"],"Dubai Creek Harbour":["Creek Gate Tower 1","Creek Gate Tower 2","Creek Rise","Harbour Gate Tower 1","The Cove"],"DIFC":["Index Tower","Central Park Tower","Park Tower A","Liberty House","Sky Gardens"],"Jumeirah Lake Towers":["Cluster A","Cluster D","Lake Shore Tower","Saba Tower 1","Goldcrest Executive","Icon Tower 1"],"Al Barsha":["Al Barsha Business Centre","Sama Tower","Majestic Tower","Elite Residence"],"Motor City":["Fox Hill","Green Community","Bennett House","Sherlock House"],"Dubai Silicon Oasis":["Silicon Heights","Le Presidium","Palace Tower","Axis Silver"],"Town Square":["Zahra Apartments","Safi Apartments","Hayat Boulevard","Rawda Apartments"]};
 
 function seedRandom(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
 const rng=seedRandom(42);
@@ -340,11 +341,16 @@ function genUnitNo(propType,rng){
   const floor=Math.floor(rng()*45)+1;const unit=Math.floor(rng()*12)+1;
   return String(floor)+String(unit).padStart(2,'0');
 }
+function genTower(area,propType,rng){
+  const towers=TOWERS[area]||["Tower 1"];
+  return towers[Math.floor(rng()*towers.length)];
+}
 function genListings(listingType,count){
   for(let i=0;i<count;i++){
     const area=AREAS[Math.floor(rng()*AREAS.length)];
     const propType=PROP_TYPES[Math.floor(rng()*PROP_TYPES.length)];
     const unitNo=genUnitNo(propType,rng);
+    const tower=genTower(area,propType,rng);
     const beds=propType==="Studio"?0:Math.floor(rng()*5)+1;
     const baths=Math.max(1,beds);
     const sqft=propType==="Villa"?2000+Math.floor(rng()*5000):propType==="Penthouse"?2500+Math.floor(rng()*3000):propType==="Studio"?350+Math.floor(rng()*250):600+Math.floor(rng()*2000);
@@ -367,8 +373,8 @@ function genListings(listingType,count){
     }
     const slug=area.toLowerCase().replace(/\s+/g,"-");
     properties.push({
-      id:pid++,unitNo,title:`Unit ${unitNo} - ${beds===0?"Studio":beds+" BR"} ${propType} in ${area}`,
-      location:`${area}, Dubai`,area,beds,baths,sqft,propType,listingType,
+      id:pid++,unitNo,tower,title:`${beds===0?"Studio":beds+" BR"} ${propType} in ${tower}, ${area}`,
+      location:`${tower}, ${area}, Dubai`,area,beds,baths,sqft,propType,listingType,
       price,currency:"AED",snapshots,changes,
       url:`https://www.propertyfinder.ae/en/plp/${listingType}/${slug}/property-${i}.html`,
       firstSeen:snapshots[0]?.date||"",lastUpdated:snapshots[snapshots.length-1]?.date||""
@@ -429,13 +435,14 @@ function renderDashboard(){
 
   // Recent changes
   const allChanges=[];
-  properties.forEach(p=>{p.changes.forEach(c=>{allChanges.push({...c,title:p.title,unitNo:p.unitNo,area:p.area,listingType:p.listingType,pid:p.id})})});
+  properties.forEach(p=>{p.changes.forEach(c=>{allChanges.push({...c,title:p.title,unitNo:p.unitNo,tower:p.tower,area:p.area,listingType:p.listingType,pid:p.id})})});
   allChanges.sort((a,b)=>b.date.localeCompare(a.date));
 
   const tbody=document.getElementById('recent-changes-body');
   tbody.innerHTML=allChanges.slice(0,15).map(c=>`<tr>
     <td><a href="#" onclick="showDetail(${c.pid})">${c.title}</a></td>
     <td class="mono" style="color:var(--muted)">${c.unitNo}</td>
+    <td style="color:var(--muted);font-size:12px">${c.tower}</td>
     <td style="color:var(--muted)">${c.area}</td>
     <td><span class="badge badge-${c.listingType}">${c.listingType}</span></td>
     <td class="text-right mono" style="color:var(--muted)">${fmtExact(c.oldPrice)}</td>
@@ -474,7 +481,7 @@ function renderProperties(){
   const fb=document.getElementById('filter-beds').value;
 
   let filtered=properties.filter(p=>{
-    if(search&&!p.title.toLowerCase().includes(search)&&!p.area.toLowerCase().includes(search)&&!p.unitNo.toLowerCase().includes(search))return false;
+    if(search&&!p.title.toLowerCase().includes(search)&&!p.area.toLowerCase().includes(search)&&!p.unitNo.toLowerCase().includes(search)&&!p.tower.toLowerCase().includes(search))return false;
     if(lt&&p.listingType!==lt)return false;
     if(fa&&p.area!==fa)return false;
     if(ft&&p.propType!==ft)return false;
@@ -501,6 +508,7 @@ function renderProperties(){
     return`<tr>
       <td><a href="#" onclick="showDetail(${p.id})">${p.title}</a></td>
       <td class="mono" style="color:var(--muted)">${p.unitNo}</td>
+      <td style="color:var(--muted);font-size:12px">${p.tower}</td>
       <td style="color:var(--muted)">${p.area}</td>
       <td><span class="badge badge-${p.listingType}">${p.listingType}</span></td>
       <td style="text-align:center">${p.beds===0?'S':p.beds}</td>
@@ -527,7 +535,7 @@ function renderDetail(id){
   const p=properties.find(x=>x.id===id);if(!p)return;
   document.getElementById('detail-breadcrumb').textContent=p.title;
   document.getElementById('detail-title').textContent=p.title;
-  document.getElementById('detail-location').textContent='Unit '+p.unitNo+' \u2022 '+p.location;
+  document.getElementById('detail-location').textContent='Unit '+p.unitNo+' \u2022 '+p.tower+' \u2022 '+p.location;
   document.getElementById('detail-price').textContent=fmtExact(p.price);
 
   const firstPrice=p.snapshots[0]?.price||p.price;

@@ -32,6 +32,8 @@ interface DashboardData {
     listing_type: string;
     property_type: string;
     bedrooms: number;
+    unit_no: string | null;
+    tower: string | null;
   }>;
   priceTrend: Array<{
     week: string;
@@ -60,6 +62,8 @@ interface DashboardData {
     listing_type: string;
     property_type: string;
     bedrooms: number;
+    unit_no: string | null;
+    tower: string | null;
   }>;
   topIncreases: Array<{
     id: number;
@@ -74,6 +78,8 @@ interface DashboardData {
     listing_type: string;
     property_type: string;
     bedrooms: number;
+    unit_no: string | null;
+    tower: string | null;
   }>;
 }
 

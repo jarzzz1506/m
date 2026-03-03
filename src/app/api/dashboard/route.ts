@@ -83,7 +83,7 @@ export async function GET() {
   // Recent price changes with property info
   const latestChanges = db
     .prepare(
-      `SELECT pc.*, p.title, p.area, p.listing_type, p.property_type, p.bedrooms
+      `SELECT pc.*, p.title, p.area, p.listing_type, p.property_type, p.bedrooms, p.unit_no, p.tower
        FROM price_changes pc
        JOIN properties p ON pc.property_id = p.id
        ORDER BY pc.detected_at DESC
@@ -127,7 +127,7 @@ export async function GET() {
   // Top price drops
   const topDrops = db
     .prepare(
-      `SELECT pc.*, p.title, p.area, p.listing_type, p.current_price, p.id as property_id, p.bedrooms
+      `SELECT pc.*, p.title, p.area, p.listing_type, p.current_price, p.id as property_id, p.bedrooms, p.unit_no, p.tower
        FROM price_changes pc
        JOIN properties p ON pc.property_id = p.id
        WHERE pc.change_pct < 0
@@ -139,7 +139,7 @@ export async function GET() {
   // Top price increases
   const topIncreases = db
     .prepare(
-      `SELECT pc.*, p.title, p.area, p.listing_type, p.current_price, p.id as property_id, p.bedrooms
+      `SELECT pc.*, p.title, p.area, p.listing_type, p.current_price, p.id as property_id, p.bedrooms, p.unit_no, p.tower
        FROM price_changes pc
        JOIN properties p ON pc.property_id = p.id
        WHERE pc.change_pct > 0

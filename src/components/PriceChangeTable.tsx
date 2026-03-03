@@ -16,6 +16,8 @@ interface PriceChange {
   listing_type: string;
   property_type: string;
   bedrooms: number;
+  unit_no: string | null;
+  tower: string | null;
 }
 
 export default function PriceChangeTable({
@@ -35,6 +37,8 @@ export default function PriceChangeTable({
           <thead>
             <tr>
               <th>Property</th>
+              <th>Unit</th>
+              <th>Tower</th>
               <th>Area</th>
               <th>Type</th>
               <th className="text-right">Old Price</th>
@@ -54,6 +58,8 @@ export default function PriceChangeTable({
                     {change.title}
                   </Link>
                 </td>
+                <td className="text-muted font-mono text-sm">{change.unit_no || "-"}</td>
+                <td className="text-muted text-sm">{change.tower || "-"}</td>
                 <td className="text-muted">{change.area}</td>
                 <td>
                   <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
@@ -97,7 +103,7 @@ export default function PriceChangeTable({
             ))}
             {changes.length === 0 && (
               <tr>
-                <td colSpan={7} className="text-center text-muted py-8">
+                <td colSpan={9} className="text-center text-muted py-8">
                   No price changes recorded yet
                 </td>
               </tr>

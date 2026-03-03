@@ -8,6 +8,8 @@ export interface ScrapedProperty {
   location: string;
   area: string;
   city: string;
+  unitNo: string;
+  tower: string;
   bedrooms: number;
   bathrooms: number;
   areaSqft: number;
@@ -189,6 +191,13 @@ function parseSearchResults(
       // Derive area from location
       const areaName = extractArea(location);
 
+      // Extract tower/building name from title
+      // Typical format: "2 BR Apartment in Tower Name, Area"
+      const tower = extractTower(title, location);
+
+      // Extract unit number if present (e.g. "Unit 2305" or "Apt 1408")
+      const unitNo = extractUnitNo(title, externalId);
+
       if (externalId && price > 0) {
         properties.push({
           externalId,
@@ -197,6 +206,8 @@ function parseSearchResults(
           location: location || areaName,
           area: areaName,
           city: "Dubai",
+          unitNo,
+          tower,
           bedrooms,
           bathrooms,
           areaSqft,
@@ -246,6 +257,35 @@ function extractArea(location: string): string {
   return parts[0] || "Unknown";
 }
 
+function extractTower(title: string, location: string): string {
+  // Try to extract tower/building from title like "2 BR Apartment in Tower Name, Area"
+  const inMatch = title.match(/\bin\s+(.+?)(?:,|$)/i);
+  if (inMatch) {
+    const afterIn = inMatch[1].trim();
+    // If it contains a known area name, the tower is likely the part before the area
+    const parts = afterIn.split(",").map((s) => s.trim());
+    if (parts.length >= 2) return parts[0];
+    // If it looks like a building name (has digits or known words), use it
+    if (/tower|gate|residence|heights|point|house|bay|palm|plaza|square|village|garden|court|cluster/i.test(afterIn)) {
+      return afterIn;
+    }
+  }
+  // Try from location: "Tower Name, Area, City"
+  const locParts = location.split(",").map((s) => s.trim());
+  if (locParts.length >= 3) return locParts[0];
+  return "";
+}
+
+function extractUnitNo(title: string, externalId: string): string {
+  // Look for explicit unit numbers in title
+  const unitMatch = title.match(/\b(?:unit|apt|flat|no\.?)\s*#?\s*(\w[\w-]*)/i);
+  if (unitMatch) return unitMatch[1];
+  // Derive from external ID as fallback
+  const idNum = externalId.replace(/\D/g, "");
+  if (idNum.length >= 3) return idNum.slice(-4);
+  return "";
+}
+
 function saveProperty(
   prop: ScrapedProperty
 ): "new" | "updated" | "price_changed" | "unchanged" {
@@ -261,8 +301,8 @@ function saveProperty(
     // New property
     const info = db
       .prepare(
-        `INSERT INTO properties (external_id, url, title, location, area, city, bedrooms, bathrooms, area_sqft, property_type, listing_type, current_price, currency, image_url)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO properties (external_id, url, title, location, area, city, unit_no, tower, bedrooms, bathrooms, area_sqft, property_type, listing_type, current_price, currency, image_url)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(
         prop.externalId,
@@ -271,6 +311,8 @@ function saveProperty(
         prop.location,
         prop.area,
         prop.city,
+        prop.unitNo,
+        prop.tower,
         prop.bedrooms,
         prop.bathrooms,
         prop.areaSqft,

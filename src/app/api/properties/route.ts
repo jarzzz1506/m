@@ -55,9 +55,9 @@ export async function GET(request: NextRequest) {
   }
 
   if (search) {
-    conditions.push("(p.title LIKE ? OR p.location LIKE ? OR p.area LIKE ?)");
+    conditions.push("(p.title LIKE ? OR p.location LIKE ? OR p.area LIKE ? OR p.unit_no LIKE ? OR p.tower LIKE ?)");
     const searchTerm = `%${search}%`;
-    values.push(searchTerm, searchTerm, searchTerm);
+    values.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
   }
 
   const whereClause =

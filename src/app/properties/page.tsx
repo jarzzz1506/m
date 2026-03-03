@@ -9,6 +9,8 @@ interface Property {
   title: string;
   location: string;
   area: string;
+  unit_no: string | null;
+  tower: string | null;
   bedrooms: number;
   bathrooms: number;
   area_sqft: number;
@@ -223,6 +225,8 @@ export default function PropertiesPage() {
             <thead>
               <tr>
                 <th>Property</th>
+                <th>Unit</th>
+                <th>Tower</th>
                 <th>Area</th>
                 <th>Type</th>
                 <th>Beds</th>
@@ -251,7 +255,7 @@ export default function PropertiesPage() {
               {loading ? (
                 [...Array(10)].map((_, i) => (
                   <tr key={i}>
-                    {[...Array(8)].map((_, j) => (
+                    {[...Array(10)].map((_, j) => (
                       <td key={j}>
                         <div className="skeleton h-4 w-full" />
                       </td>
@@ -260,7 +264,7 @@ export default function PropertiesPage() {
                 ))
               ) : properties.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center text-muted py-12">
+                  <td colSpan={10} className="text-center text-muted py-12">
                     No properties found matching your filters
                   </td>
                 </tr>
@@ -275,6 +279,8 @@ export default function PropertiesPage() {
                         {prop.title}
                       </Link>
                     </td>
+                    <td className="text-muted font-mono text-sm">{prop.unit_no || "-"}</td>
+                    <td className="text-muted text-sm">{prop.tower || "-"}</td>
                     <td className="text-muted">{prop.area}</td>
                     <td>
                       <span
