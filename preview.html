@@ -3,344 +3,636 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MothGuard London | Professional Moth Treatment &amp; Prevention</title>
-<meta name="description" content="London's leading moth treatment specialists. Expert carpet moth, clothes moth & pantry moth removal. BPCA certified. Same-day service available."/>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        primary: { DEFAULT: '#2d5016', dark: '#1e3a0f', light: '#4a7c2e' },
-        accent: { DEFAULT: '#d4a843', dark: '#b8922e' },
-        foreground: '#1a1a2e',
-        'section-alt': '#f8f6f0',
-        muted: '#6b7280',
-      }
-    }
-  }
+<title>PropertyPulse | Dubai Property Price Monitor</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f172a;--surface:#1e293b;--surface-hover:#334155;--border:#334155;
+  --fg:#e2e8f0;--muted:#94a3b8;--primary:#3b82f6;--primary-light:#60a5fa;
+  --accent:#10b981;--danger:#ef4444;--warning:#f59e0b;--card:#1e293b;
 }
-</script>
-<style>html{scroll-behavior:smooth}body{font-family:Arial,Helvetica,sans-serif;color:#1a1a2e}</style>
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;display:flex;min-height:100vh}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* Sidebar */
+.sidebar{position:fixed;left:0;top:0;height:100%;width:250px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:50}
+.sidebar-logo{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--fg)}
+.logo-icon{width:36px;height:36px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:18px}
+.logo-text{font-weight:700;font-size:18px;line-height:1.2}
+.logo-sub{font-size:11px;color:var(--muted)}
+.sidebar nav{flex:1;padding:16px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;text-decoration:none;margin-bottom:2px;transition:all .15s}
+.nav-item:hover,.nav-item.active{color:var(--primary-light);background:rgba(59,130,246,.1)}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border)}
+.sidebar-footer-box{padding:12px 16px;background:var(--bg);border-radius:8px}
+.sidebar-footer-box .label{font-size:11px;color:var(--muted)}
+.sidebar-footer-box .value{font-size:13px;font-weight:600;margin-top:2px}
+.sidebar-footer-box .sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* Main */
+.main{flex:1;margin-left:250px;padding:32px;overflow:auto}
+.page{display:none}.page.active{display:block}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-header h1{font-size:24px;font-weight:700}
+.page-header p{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* Stats Cards */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:border-color .15s}
+.stat-card:hover{border-color:rgba(59,130,246,.3)}
+.stat-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
+.stat-value{font-size:22px;font-weight:700}
+.stat-label{font-size:13px;color:var(--muted);margin-top:4px}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.stat-sub .up{color:var(--accent)}.stat-sub .down{color:var(--danger)}
+
+/* Charts */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.chart-card h3{font-size:15px;font-weight:600;margin-bottom:16px}
+.chart-wrap{position:relative;height:280px}
+
+/* Tables */
+.table-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px}
+.table-card .table-header{padding:16px 20px;border-bottom:1px solid var(--border)}
+.table-card .table-header h3{font-size:15px;font-weight:600}
+table{border-collapse:collapse;width:100%}
+th{text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:10px 16px;border-bottom:1px solid var(--border)}
+td{padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px}
+tr:hover td{background:var(--surface-hover)}
+.text-right{text-align:right}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-sale{background:rgba(59,130,246,.1);color:var(--primary-light)}
+.badge-rent{background:rgba(245,158,11,.1);color:var(--warning)}
+.change-up{color:var(--danger)}.change-down{color:var(--accent)}
+a{color:var(--primary-light);text-decoration:none}a:hover{text-decoration:underline}
+
+/* Filters */
+.filters{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px;display:flex;flex-wrap:wrap;gap:12px}
+.filter-toggle{display:flex;gap:2px;background:var(--bg);border-radius:8px;padding:4px}
+.filter-toggle button{padding:8px 16px;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted)}
+.filter-toggle button.active{background:var(--primary);color:white}
+select,input[type=text]{padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--fg);outline:none}
+select:focus,input:focus{border-color:var(--primary)}
+
+/* Property Detail */
+.detail-header{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px}
+.detail-title{font-size:22px;font-weight:700}
+.detail-location{color:var(--muted);margin-top:4px;font-size:14px}
+.detail-tags{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.detail-tag{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500;background:var(--surface-hover);color:var(--fg)}
+.detail-price{font-size:28px;font-weight:700;text-align:right}
+.detail-change{font-size:13px;font-weight:500;margin-top:4px}
+.detail-link{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:8px 16px;background:rgba(59,130,246,.1);color:var(--primary-light);border-radius:8px;font-size:13px;font-weight:500}
+.mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.mini-stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.mini-stat .label{font-size:13px;color:var(--muted)}
+.mini-stat .value{font-size:20px;font-weight:700;margin-top:4px}
+.breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:16px}
+.breadcrumb a{color:var(--muted)}.breadcrumb a:hover{color:var(--fg)}
+
+/* Trend table bars */
+.trend-bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;width:120px}
+.trend-bar-fill{height:100%;background:var(--accent);border-radius:4px}
+
+/* Pagination */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--border)}
+.pagination .info{font-size:13px;color:var(--muted)}
+.page-btns{display:flex;gap:4px}
+.page-btn{padding:6px 12px;border:none;border-radius:6px;font-size:13px;cursor:pointer;background:var(--surface-hover);color:var(--fg);transition:all .15s}
+.page-btn:hover{background:var(--border)}
+.page-btn.active{background:var(--primary);color:white}
+.page-btn:disabled{opacity:.3;cursor:not-allowed}
+
+@media(max-width:1200px){.stats-grid{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.stats-grid{grid-template-columns:1fr}.mini-stats{grid-template-columns:repeat(2,1fr)}}
+</style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="flex h-16 items-center justify-between">
-      <a href="#" class="flex items-center gap-2">
-        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white text-lg font-bold">M</div>
-        <div><span class="text-lg font-bold text-primary">MothGuard</span><span class="hidden sm:inline text-sm text-muted ml-1">London</span></div>
-      </a>
-      <nav class="hidden md:flex items-center gap-6">
-        <a href="#services" class="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">Services</a>
-        <a href="#about" class="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">About</a>
-        <a href="#process" class="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">Our Process</a>
-        <a href="#testimonials" class="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">Reviews</a>
-        <a href="#coverage" class="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">Areas</a>
-        <a href="#faq" class="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">FAQ</a>
-      </nav>
-      <div class="flex items-center gap-3">
-        <a href="tel:02071234567" class="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-primary">
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
-          020 7123 4567
-        </a>
-        <a href="#contact" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark transition-colors">Free Quote</a>
-      </div>
+<!-- Sidebar -->
+<aside class="sidebar">
+  <a class="sidebar-logo" href="#" onclick="showPage('dashboard')">
+    <div class="logo-icon">P</div>
+    <div><div class="logo-text">PropertyPulse</div><div class="logo-sub">Dubai Price Monitor</div></div>
+  </a>
+  <nav>
+    <a class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">&#9638; Dashboard</a>
+    <a class="nav-item" id="nav-properties" onclick="showPage('properties')">&#9962; Properties</a>
+    <a class="nav-item" id="nav-trends" onclick="showPage('trends')">&#8599; Trends</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-footer-box">
+      <div class="label">Data Source</div>
+      <div class="value">propertyfinder.ae</div>
+      <div class="sub">Dubai, UAE</div>
     </div>
   </div>
-</header>
+</aside>
 
-<!-- HERO -->
-<section class="relative pt-16 bg-gradient-to-br from-primary-dark via-primary to-primary-light overflow-hidden">
-  <div class="absolute inset-0 opacity-10"><div class="absolute inset-0" style="background-image:radial-gradient(circle at 25% 25%,white 1px,transparent 1px),radial-gradient(circle at 75% 75%,white 1px,transparent 1px);background-size:60px 60px"></div></div>
-  <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36">
-    <div class="grid lg:grid-cols-2 gap-12 items-center">
+<!-- Main Content -->
+<div class="main">
+
+<!-- ======== DASHBOARD PAGE ======== -->
+<div class="page active" id="page-dashboard">
+  <div class="page-header">
+    <div><h1>Dashboard</h1><p>Monitor Dubai property prices from propertyfinder.ae</p></div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(59,130,246,.1);color:var(--primary-light)">&#9962;</div>
+      <div class="stat-value">140</div>
+      <div class="stat-label">Total Properties</div>
+      <div class="stat-sub">80 sale / 60 rent</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">&#36;</div>
+      <div class="stat-value">AED 5.26M</div>
+      <div class="stat-label">Avg. Sale Price</div>
+      <div class="stat-sub">Per listing</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)">&#36;</div>
+      <div class="stat-value">AED 304K</div>
+      <div class="stat-label">Avg. Rent Price</div>
+      <div class="stat-sub">Annual</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(59,130,246,.1);color:var(--primary-light)">&#8693;</div>
+      <div class="stat-value">137</div>
+      <div class="stat-label">Price Changes</div>
+      <div class="stat-sub"><span class="up">72 up</span> / <span class="down">65 down</span> (30d)</div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card"><h3>Average Sale Price by Area</h3><div class="chart-wrap"><canvas id="chart-area-sale"></canvas></div></div>
+    <div class="chart-card"><h3>Average Rent Price by Area</h3><div class="chart-wrap"><canvas id="chart-area-rent"></canvas></div></div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card"><h3>Sale Price Trend (Weekly Avg)</h3><div class="chart-wrap"><canvas id="chart-sale-trend"></canvas></div></div>
+    <div class="chart-card"><h3>Rent Price Trend (Weekly Avg)</h3><div class="chart-wrap"><canvas id="chart-rent-trend"></canvas></div></div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header"><h3>Recent Price Changes</h3></div>
+    <table>
+      <thead><tr><th>Property</th><th>Area</th><th>Type</th><th class="text-right">Old Price</th><th class="text-right">New Price</th><th class="text-right">Change</th><th class="text-right">When</th></tr></thead>
+      <tbody id="recent-changes-body"></tbody>
+    </table>
+  </div>
+
+  <div class="charts-row">
+    <div class="table-card">
+      <div class="table-header"><h3>Biggest Price Drops</h3></div>
+      <table>
+        <thead><tr><th>Property</th><th>Area</th><th class="text-right">Change</th></tr></thead>
+        <tbody id="top-drops-body"></tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <div class="table-header"><h3>Biggest Price Increases</h3></div>
+      <table>
+        <thead><tr><th>Property</th><th>Area</th><th class="text-right">Change</th></tr></thead>
+        <tbody id="top-increases-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ======== PROPERTIES PAGE ======== -->
+<div class="page" id="page-properties">
+  <div class="page-header">
+    <div><h1>Properties</h1><p>Browse and filter tracked properties <span id="prop-count" style="color:var(--fg);font-weight:600"></span></p></div>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="search-input" placeholder="Search properties..." style="flex:1;min-width:200px" oninput="filterProperties()">
+    <select id="filter-listing" onchange="filterProperties()">
+      <option value="">All Types</option><option value="sale">For Sale</option><option value="rent">For Rent</option>
+    </select>
+    <select id="filter-area" onchange="filterProperties()">
+      <option value="">All Areas</option>
+    </select>
+    <select id="filter-proptype" onchange="filterProperties()">
+      <option value="">All Property Types</option>
+      <option>Apartment</option><option>Villa</option><option>Townhouse</option><option>Penthouse</option><option>Studio</option>
+    </select>
+    <select id="filter-beds" onchange="filterProperties()">
+      <option value="">Any Beds</option><option value="0">Studio+</option><option value="1">1+ BR</option><option value="2">2+ BR</option><option value="3">3+ BR</option><option value="4">4+ BR</option>
+    </select>
+  </div>
+
+  <div class="table-card">
+    <table>
+      <thead><tr>
+        <th>Property</th><th>Area</th><th>Type</th><th>Beds</th>
+        <th class="text-right" style="cursor:pointer" onclick="sortProperties('area_sqft')">Size</th>
+        <th class="text-right" style="cursor:pointer" onclick="sortProperties('price')">Price</th>
+        <th class="text-right">Change</th>
+        <th class="text-right" style="cursor:pointer" onclick="sortProperties('updated')">Updated</th>
+      </tr></thead>
+      <tbody id="properties-body"></tbody>
+    </table>
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<!-- ======== TRENDS PAGE ======== -->
+<div class="page" id="page-trends">
+  <div class="page-header">
+    <div><h1>Market Trends</h1><p>Analyze Dubai property market trends and comparisons</p></div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-toggle" id="trend-type-toggle">
+      <button class="active" onclick="setTrendType('sale')">For Sale</button>
+      <button onclick="setTrendType('rent')">For Rent</button>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:24px"><h3>Price Trend Over Time</h3><div class="chart-wrap"><canvas id="chart-trend-main"></canvas></div></div>
+
+  <div class="charts-row">
+    <div class="chart-card"><h3>Average Price by Area</h3><div class="chart-wrap"><canvas id="chart-trend-area"></canvas></div></div>
+    <div class="chart-card"><h3>Price per sqft by Area</h3><div class="chart-wrap"><canvas id="chart-trend-sqft"></canvas></div></div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card"><h3>Average Price by Bedrooms</h3><div class="chart-wrap"><canvas id="chart-trend-beds"></canvas></div></div>
+    <div class="chart-card"><h3>Average Price by Property Type</h3><div class="chart-wrap"><canvas id="chart-trend-type"></canvas></div></div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header"><h3>Area Comparison</h3></div>
+    <table>
+      <thead><tr><th>Area</th><th class="text-right">Listings</th><th class="text-right">Avg Price</th><th class="text-right">Avg Size</th><th class="text-right">AED/sqft</th></tr></thead>
+      <tbody id="area-comparison-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ======== PROPERTY DETAIL PAGE ======== -->
+<div class="page" id="page-detail">
+  <div class="breadcrumb">
+    <a href="#" onclick="showPage('properties')">Properties</a>
+    <span>&#8250;</span>
+    <span id="detail-breadcrumb"></span>
+  </div>
+  <div class="detail-header">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px">
       <div>
-        <div class="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-sm px-4 py-1.5 text-sm text-white/90 mb-6">
-          <svg class="h-4 w-4 text-accent" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
-          BPCA Certified | Trusted Since 2008
-        </div>
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">London&rsquo;s Expert <span class="text-accent">Moth Treatment</span> Specialists</h1>
-        <p class="mt-6 text-lg sm:text-xl text-white/80 max-w-xl leading-relaxed">Protect your home, wardrobe, and carpets from destructive moth infestations. Fast, discreet, and guaranteed results across all London boroughs.</p>
-        <div class="mt-8 flex flex-col sm:flex-row gap-4">
-          <a href="#contact" class="inline-flex items-center justify-center rounded-lg bg-accent px-7 py-3.5 text-base font-bold text-primary-dark hover:bg-accent-dark transition-colors shadow-lg">Get a Free Survey <svg class="ml-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg></a>
-          <a href="tel:02071234567" class="inline-flex items-center justify-center rounded-lg border-2 border-white/30 px-7 py-3.5 text-base font-semibold text-white hover:bg-white/10 transition-colors"><svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>Call 020 7123 4567</a>
-        </div>
-        <div class="mt-10 flex gap-8 sm:gap-12">
-          <div><div class="text-2xl sm:text-3xl font-bold text-white">15K+</div><div class="text-sm text-white/60">Homes Treated</div></div>
-          <div><div class="text-2xl sm:text-3xl font-bold text-white">17</div><div class="text-sm text-white/60">Years Experience</div></div>
-          <div><div class="text-2xl sm:text-3xl font-bold text-white">4.9/5</div><div class="text-sm text-white/60">Google Rating</div></div>
-        </div>
+        <div class="detail-title" id="detail-title"></div>
+        <div class="detail-location" id="detail-location"></div>
+        <div class="detail-tags" id="detail-tags"></div>
       </div>
-      <div class="hidden lg:flex items-center justify-center">
-        <div class="relative w-96 h-96 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
-          <div class="text-center p-8">
-            <div class="text-7xl mb-4">&#128737;&#65039;</div>
-            <h3 class="text-2xl font-bold text-white mb-2">Same-Day Service</h3>
-            <p class="text-white/70">Emergency moth treatment available 7 days a week across London</p>
-            <div class="mt-6 inline-flex items-center gap-2 bg-accent/20 rounded-full px-4 py-2 text-accent text-sm font-medium">
-              <span class="h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>Technicians available now
-            </div>
-          </div>
-        </div>
+      <div style="text-align:right">
+        <div class="detail-price" id="detail-price"></div>
+        <div class="detail-change" id="detail-change"></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px" id="detail-tracked"></div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px" id="detail-psf"></div>
       </div>
     </div>
+    <a class="detail-link" id="detail-link" href="#" target="_blank">View on PropertyFinder &#8599;</a>
   </div>
-  <div class="absolute bottom-0 left-0 right-0"><svg viewBox="0 0 1440 80" fill="none" class="w-full"><path d="M0,48 C480,80 960,0 1440,48 L1440,80 L0,80 Z" fill="white"/></svg></div>
-</section>
+  <div class="mini-stats" id="detail-mini-stats"></div>
+  <div class="chart-card" style="margin-bottom:24px"><h3>Price History</h3><div class="chart-wrap"><canvas id="chart-detail-price"></canvas></div></div>
+  <div class="table-card">
+    <div class="table-header"><h3>Price Change History</h3></div>
+    <table>
+      <thead><tr><th>Date</th><th class="text-right">Old Price</th><th class="text-right">New Price</th><th class="text-right">Change</th><th class="text-right">% Change</th></tr></thead>
+      <tbody id="detail-changes-body"></tbody>
+    </table>
+  </div>
+</div>
 
-<!-- SERVICES -->
-<section id="services" class="py-20 sm:py-28 bg-white">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <p class="text-sm font-semibold uppercase tracking-wider text-accent">Our Services</p>
-      <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-foreground">Comprehensive Moth Treatment Solutions</h2>
-      <p class="mt-4 text-lg text-muted">From residential homes to commercial properties, we offer the full range of moth control services tailored to your needs.</p>
-    </div>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8" id="services-grid"></div>
-  </div>
-</section>
-
-<!-- ABOUT -->
-<section id="about" class="py-20 sm:py-28 bg-section-alt">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="grid lg:grid-cols-2 gap-16 items-center">
-      <div>
-        <p class="text-sm font-semibold uppercase tracking-wider text-accent">Why Choose Us</p>
-        <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-foreground">London&rsquo;s Most Trusted Moth Control Experts</h2>
-        <p class="mt-6 text-muted leading-relaxed">Since 2008, MothGuard London has been protecting homes and businesses across the capital from damaging moth infestations. Our team of BPCA-certified technicians combines deep entomological knowledge with the latest treatment technologies to deliver lasting, guaranteed results.</p>
-        <p class="mt-4 text-muted leading-relaxed">We understand the distress a moth infestation can cause &mdash; from ruined heirloom carpets to damaged designer wardrobes. That&rsquo;s why we offer free, no-obligation surveys and transparent pricing with no hidden fees.</p>
-        <div class="mt-8 inline-flex items-center gap-3 rounded-lg bg-white border border-gray-200 px-5 py-3">
-          <svg class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
-          <div><div class="text-sm font-semibold text-foreground">Fully Insured &amp; Guaranteed</div><div class="text-xs text-muted">&pound;5M public liability insurance | All treatments guaranteed</div></div>
-        </div>
-      </div>
-      <div class="grid sm:grid-cols-2 gap-6" id="credentials-grid"></div>
-    </div>
-  </div>
-</section>
-
-<!-- PROCESS -->
-<section id="process" class="py-20 sm:py-28 bg-white">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <p class="text-sm font-semibold uppercase tracking-wider text-accent">How It Works</p>
-      <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-foreground">Our Simple 4-Step Process</h2>
-      <p class="mt-4 text-lg text-muted">From initial contact to a moth-free home, we make the process straightforward and stress-free.</p>
-    </div>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8" id="steps-grid"></div>
-  </div>
-</section>
-
-<!-- TESTIMONIALS -->
-<section id="testimonials" class="py-20 sm:py-28 bg-section-alt">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <p class="text-sm font-semibold uppercase tracking-wider text-accent">Customer Reviews</p>
-      <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-foreground">Trusted by Thousands of London Homeowners</h2>
-      <p class="mt-4 text-lg text-muted">Don&rsquo;t just take our word for it. Here&rsquo;s what our customers say about their experience with MothGuard London.</p>
-    </div>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="testimonials-grid"></div>
-    <div class="mt-12 text-center">
-      <div class="inline-flex items-center gap-3 rounded-full bg-white border border-gray-200 px-6 py-3 shadow-sm">
-        <div class="flex gap-0.5" id="google-stars"></div>
-        <span class="text-sm font-semibold text-foreground">4.9/5 from 800+ Google Reviews</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- COVERAGE -->
-<section id="coverage" class="py-20 sm:py-28 bg-white">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <p class="text-sm font-semibold uppercase tracking-wider text-accent">Service Areas</p>
-      <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-foreground">Covering All London Boroughs</h2>
-      <p class="mt-4 text-lg text-muted">Our fleet of fully-equipped vans covers every corner of Greater London. No call-out charges, no travel fees.</p>
-    </div>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6" id="areas-grid"></div>
-    <p class="mt-8 text-center text-sm text-muted">Don&rsquo;t see your area? We likely cover it. <a href="#contact" class="text-primary font-medium underline">Get in touch</a> to confirm coverage in your postcode.</p>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section id="faq" class="py-20 sm:py-28 bg-section-alt">
-  <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12">
-      <p class="text-sm font-semibold uppercase tracking-wider text-accent">FAQ</p>
-      <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-foreground">Frequently Asked Questions</h2>
-    </div>
-    <div class="rounded-xl bg-white border border-gray-200 px-6 sm:px-8" id="faq-list"></div>
-  </div>
-</section>
-
-<!-- CTA / CONTACT -->
-<section id="contact" class="py-20 sm:py-28 bg-gradient-to-br from-primary-dark via-primary to-primary-light">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="grid lg:grid-cols-2 gap-16 items-start">
-      <div>
-        <h2 class="text-3xl sm:text-4xl font-bold text-white">Get Your Free Moth Survey Today</h2>
-        <p class="mt-4 text-lg text-white/80 max-w-lg">Don&rsquo;t let moths cause further damage. Contact us now for a free, no-obligation property survey and transparent quote.</p>
-        <div class="mt-8 space-y-4">
-          <a href="tel:02071234567" class="flex items-center gap-3 text-white hover:text-accent transition-colors">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/15"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg></div>
-            <div><div class="text-sm text-white/60">Call us</div><div class="font-semibold">020 7123 4567</div></div>
-          </a>
-          <a href="mailto:info@mothguard.london" class="flex items-center gap-3 text-white hover:text-accent transition-colors">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/15"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div>
-            <div><div class="text-sm text-white/60">Email us</div><div class="font-semibold">info@mothguard.london</div></div>
-          </a>
-          <div class="flex items-center gap-3 text-white">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/15"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
-            <div><div class="text-sm text-white/60">Working hours</div><div class="font-semibold">Mon-Sat: 8am-8pm | Sun: 10am-6pm</div></div>
-          </div>
-        </div>
-      </div>
-      <div class="rounded-xl bg-white p-6 sm:p-8 shadow-xl">
-        <h3 class="text-xl font-bold text-foreground mb-1">Request a Free Quote</h3>
-        <p class="text-sm text-muted mb-6">Fill in the form below and we&rsquo;ll get back to you within 2 hours.</p>
-        <form class="space-y-4" onsubmit="event.preventDefault();alert('Thank you! We will contact you shortly.')">
-          <div class="grid sm:grid-cols-2 gap-4">
-            <div><label class="block text-sm font-medium text-foreground mb-1">Full Name *</label><input type="text" required class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Your name"/></div>
-            <div><label class="block text-sm font-medium text-foreground mb-1">Phone Number *</label><input type="tel" required class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="07xxx xxx xxx"/></div>
-          </div>
-          <div><label class="block text-sm font-medium text-foreground mb-1">Email Address *</label><input type="email" required class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="you@example.com"/></div>
-          <div><label class="block text-sm font-medium text-foreground mb-1">Postcode *</label><input type="text" required class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="e.g. SW1A 1AA"/></div>
-          <div><label class="block text-sm font-medium text-foreground mb-1">Type of Problem</label><select class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-muted"><option value="">Select...</option><option value="carpet">Carpet Moths</option><option value="clothes">Clothes Moths</option><option value="pantry">Pantry Moths</option><option value="unsure">Not Sure</option><option value="commercial">Commercial Enquiry</option></select></div>
-          <div><label class="block text-sm font-medium text-foreground mb-1">Tell Us More</label><textarea rows="3" class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none" placeholder="Describe the problem or any details that might help..."></textarea></div>
-          <button type="submit" class="w-full rounded-lg bg-primary px-6 py-3 text-base font-bold text-white hover:bg-primary-dark transition-colors">Get My Free Quote</button>
-          <p class="text-xs text-center text-muted">No spam. Your details are safe with us.</p>
-        </form>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="bg-foreground text-white/70">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
-      <div class="sm:col-span-2 lg:col-span-1">
-        <div class="flex items-center gap-2 mb-4"><div class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white text-lg font-bold">M</div><span class="text-lg font-bold text-white">MothGuard London</span></div>
-        <p class="text-sm leading-relaxed">London&rsquo;s leading specialist moth treatment company. BPCA certified, fully insured, and trusted by thousands of homeowners since 2008.</p>
-      </div>
-      <div>
-        <h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Services</h4>
-        <ul class="space-y-2 text-sm">
-          <li><a href="#services" class="hover:text-white transition-colors">Carpet Moth Treatment</a></li>
-          <li><a href="#services" class="hover:text-white transition-colors">Clothes Moth Removal</a></li>
-          <li><a href="#services" class="hover:text-white transition-colors">Pantry Moth Control</a></li>
-          <li><a href="#services" class="hover:text-white transition-colors">Heat Treatment</a></li>
-          <li><a href="#services" class="hover:text-white transition-colors">Moth Surveys</a></li>
-          <li><a href="#services" class="hover:text-white transition-colors">Commercial Services</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Company</h4>
-        <ul class="space-y-2 text-sm">
-          <li><a href="#about" class="hover:text-white transition-colors">About Us</a></li>
-          <li><a href="#testimonials" class="hover:text-white transition-colors">Customer Reviews</a></li>
-          <li><a href="#coverage" class="hover:text-white transition-colors">Service Areas</a></li>
-          <li><a href="#faq" class="hover:text-white transition-colors">FAQ</a></li>
-          <li><a href="#contact" class="hover:text-white transition-colors">Contact Us</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Contact</h4>
-        <ul class="space-y-3 text-sm">
-          <li><a href="tel:02071234567" class="hover:text-white transition-colors">020 7123 4567</a></li>
-          <li><a href="mailto:info@mothguard.london" class="hover:text-white transition-colors">info@mothguard.london</a></li>
-          <li>Mon-Sat: 8am-8pm</li>
-          <li>Sun: 10am-6pm</li>
-        </ul>
-      </div>
-    </div>
-    <div class="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
-      <p class="text-xs">&copy; 2026 MothGuard London. All rights reserved. Company No. 07654321.</p>
-      <div class="flex gap-6 text-xs">
-        <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-        <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
-        <a href="#" class="hover:text-white transition-colors">Cookie Policy</a>
-      </div>
-    </div>
-  </div>
-</footer>
+</div>
 
 <script>
-// Data
-const services = [
-  { icon: "&#127968;", title: "Carpet Moth Treatment", description: "Specialist treatment for carpet moths that damage wool carpets, rugs, and underlay. We use targeted insecticide sprays and heat treatment.", features: ["Full carpet inspection", "Residual spray treatment", "Larvae removal", "12-month guarantee"] },
-  { icon: "&#128084;", title: "Clothes Moth Removal", description: "Protect your wardrobe from common clothes moths. Expert treatment for cashmere, silk, wool, and other natural fibre garments.", features: ["Wardrobe inspection", "Pheromone trapping", "Fumigation treatment", "Prevention advice"] },
-  { icon: "&#127838;", title: "Pantry Moth Control", description: "Eliminate Indian meal moths and other pantry pests that contaminate stored food products in kitchens and larders.", features: ["Source identification", "Deep clean protocol", "Residual treatment", "Monitoring traps"] },
-  { icon: "&#128293;", title: "Heat Treatment", description: "Chemical-free moth elimination using controlled heat. Ideal for sensitive environments, antiques, and properties with children or pets.", features: ["Chemical-free option", "Kills all life stages", "Single visit solution", "Safe for delicates"] },
-  { icon: "&#128269;", title: "Moth Surveys & Monitoring", description: "Comprehensive property surveys using pheromone traps to identify moth species, infestation severity, and risk areas.", features: ["Species identification", "Risk assessment report", "Trap monitoring", "Ongoing reporting"] },
-  { icon: "&#127970;", title: "Commercial Moth Control", description: "Specialist moth management for museums, galleries, retail stores, hotels, and heritage properties across London.", features: ["Bespoke contracts", "Discreet service", "Compliance reports", "24/7 emergency response"] },
-];
-const checkSvg = '<svg class="h-4 w-4 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>';
-document.getElementById('services-grid').innerHTML = services.map(s => `<div class="group rounded-xl border border-gray-200 p-6 hover:border-primary/30 hover:shadow-lg transition-all duration-300"><div class="text-4xl mb-4">${s.icon}</div><h3 class="text-xl font-bold text-foreground mb-2">${s.title}</h3><p class="text-muted text-sm leading-relaxed mb-4">${s.description}</p><ul class="space-y-2">${s.features.map(f => `<li class="flex items-center gap-2 text-sm text-foreground/80">${checkSvg} ${f}</li>`).join('')}</ul></div>`).join('');
+// ==================== DATA ====================
+const COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1','#14b8a6','#e879f9','#fb923c','#4ade80','#a78bfa'];
 
-// Credentials
-const credentials = [
-  { icon: "shield", title: "BPCA Certified", description: "Full members of the British Pest Control Association" },
-  { icon: "academic", title: "RSPH Qualified", description: "Royal Society for Public Health Level 2 certified technicians" },
-  { icon: "star", title: "5-Star Rated", description: "4.9/5 average across 800+ verified Google reviews" },
-  { icon: "clock", title: "Same-Day Service", description: "Emergency response available 7 days a week across London" },
-];
-const iconMap = {
-  shield: '<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>',
-  academic: '<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.636 50.636 0 00-2.658-.813A59.906 59.906 0 0112 3.493a59.903 59.903 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"/></svg>',
-  star: '<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17l-5.384 3.18 1.421-5.99L2.26 7.84l6.134-.533L11.42 2l3.026 5.306 6.134.534-4.795 4.519 1.42 5.99-5.383-3.18z"/></svg>',
-  clock: '<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
-};
-document.getElementById('credentials-grid').innerHTML = credentials.map(c => `<div class="rounded-xl bg-white border border-gray-200 p-6 shadow-sm"><div class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary mb-4">${iconMap[c.icon]}</div><h3 class="text-lg font-bold text-foreground">${c.title}</h3><p class="mt-1 text-sm text-muted">${c.description}</p></div>`).join('');
+const AREAS=["Dubai Marina","Downtown Dubai","Palm Jumeirah","JBR","Business Bay","Arabian Ranches","Dubai Hills Estate","Jumeirah Village Circle","Dubai Creek Harbour","DIFC","Jumeirah Lake Towers","Al Barsha","Motor City","Dubai Silicon Oasis","Town Square"];
+const PROP_TYPES=["Apartment","Villa","Townhouse","Penthouse","Studio"];
 
-// Steps
-const steps = [
-  { step: "01", title: "Free Survey", description: "We visit your property to inspect the infestation, identify the moth species, and assess the extent of damage. No charge, no obligation." },
-  { step: "02", title: "Custom Treatment Plan", description: "Based on our findings, we recommend a tailored treatment plan with transparent pricing. We explain every step so you know exactly what to expect." },
-  { step: "03", title: "Professional Treatment", description: "Our BPCA-certified technicians carry out the treatment using industry-leading products and techniques. Most treatments are completed in a single visit." },
-  { step: "04", title: "Follow-Up & Prevention", description: "We return to verify the treatment's success, install monitoring traps, and provide bespoke prevention advice to keep your home moth-free." },
-];
-document.getElementById('steps-grid').innerHTML = steps.map(s => `<div class="relative"><div class="text-4xl font-bold text-primary/15 mb-3">${s.step}</div><h3 class="text-lg font-bold text-foreground mb-2">${s.title}</h3><p class="text-sm text-muted leading-relaxed">${s.description}</p></div>`).join('');
+function seedRandom(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
+const rng=seedRandom(42);
 
-// Testimonials
-const testimonials = [
-  { name: "Sarah Thompson", location: "Kensington, W8", text: "We had a terrible carpet moth infestation that was destroying our Persian rugs. MothGuard came out the same day, were incredibly thorough, and the moths haven't returned in over a year. Worth every penny." },
-  { name: "James Harrington", location: "Islington, N1", text: "After finding moth damage to several cashmere jumpers, I called MothGuard in a panic. They were calm, professional, and sorted the problem quickly. Their prevention advice has been invaluable." },
-  { name: "Priya Patel", location: "Richmond, TW9", text: "Used MothGuard for our boutique hotel. They worked discreetly outside of guest hours and set up an ongoing monitoring programme. Absolutely first-class service and communication throughout." },
-  { name: "David Chen", location: "Hampstead, NW3", text: "The heat treatment option was perfect for us as we have young children. No chemicals, done in one visit, and the moths were completely eradicated. Highly recommend their eco-friendly approach." },
-  { name: "Emma Fitzgerald", location: "Chelsea, SW3", text: "MothGuard saved my vintage clothing collection. Their technician identified the exact species and explained the treatment process clearly. Three months on and no sign of moths returning." },
-  { name: "Robert Singh", location: "Dulwich, SE21", text: "Professional from start to finish. The free survey was genuinely useful, no hard sell at all. Fair pricing and the 12-month guarantee gives real peace of mind. Already recommended to neighbours." },
-];
-const starSvg = '<svg class="h-4 w-4 text-accent" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clip-rule="evenodd"/></svg>';
-const stars5 = Array(5).fill(starSvg).join('');
-document.getElementById('testimonials-grid').innerHTML = testimonials.map(t => `<div class="rounded-xl bg-white border border-gray-200 p-6 shadow-sm"><div class="flex gap-0.5">${stars5}</div><p class="mt-4 text-sm text-foreground/80 leading-relaxed">&ldquo;${t.text}&rdquo;</p><div class="mt-4 pt-4 border-t border-gray-100"><div class="text-sm font-semibold text-foreground">${t.name}</div><div class="text-xs text-muted">${t.location}</div></div></div>`).join('');
-const starSvgLg = '<svg class="h-5 w-5 text-accent" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clip-rule="evenodd"/></svg>';
-document.getElementById('google-stars').innerHTML = Array(5).fill(starSvgLg).join('');
+function getPricePerSqft(area,type){
+  const m={"Palm Jumeirah":2800,"Downtown Dubai":2600,DIFC:2500,"Dubai Marina":2200,"Dubai Creek Harbour":2100,JBR:2000,"Business Bay":1800,"Dubai Hills Estate":1700,"Jumeirah Lake Towers":1400,"Arabian Ranches":1300,"Al Barsha":1200,"Jumeirah Village Circle":1100,"Motor City":1000,"Dubai Silicon Oasis":950,"Town Square":900};
+  const t={Penthouse:1.5,Villa:1.2,Townhouse:1,Apartment:1,Studio:.95};
+  return(m[area]||1200)*(t[type]||1)*(.85+rng()*.3);
+}
 
-// Coverage areas
-const areas = [
-  { region: "Central London", boroughs: ["Westminster", "City of London", "Camden", "Islington", "Southwark", "Lambeth"] },
-  { region: "West London", boroughs: ["Kensington & Chelsea", "Hammersmith & Fulham", "Ealing", "Hounslow", "Richmond", "Hillingdon"] },
-  { region: "North London", boroughs: ["Barnet", "Haringey", "Enfield", "Waltham Forest", "Hackney", "Hampstead"] },
-  { region: "South London", boroughs: ["Wandsworth", "Merton", "Croydon", "Bromley", "Greenwich", "Lewisham"] },
-  { region: "East London", boroughs: ["Tower Hamlets", "Newham", "Barking", "Redbridge", "Havering", "Bexley"] },
-];
-document.getElementById('areas-grid').innerHTML = areas.map(a => `<div class="rounded-xl border border-gray-200 p-5"><h3 class="text-sm font-bold text-primary uppercase tracking-wide mb-3">${a.region}</h3><ul class="space-y-1.5">${a.boroughs.map(b => `<li class="text-sm text-muted">${b}</li>`).join('')}</ul></div>`).join('');
+// Generate properties
+const properties=[];
+let pid=1;
+function genListings(listingType,count){
+  for(let i=0;i<count;i++){
+    const area=AREAS[Math.floor(rng()*AREAS.length)];
+    const propType=PROP_TYPES[Math.floor(rng()*PROP_TYPES.length)];
+    const beds=propType==="Studio"?0:Math.floor(rng()*5)+1;
+    const baths=Math.max(1,beds);
+    const sqft=propType==="Villa"?2000+Math.floor(rng()*5000):propType==="Penthouse"?2500+Math.floor(rng()*3000):propType==="Studio"?350+Math.floor(rng()*250):600+Math.floor(rng()*2000);
+    let basePrice;
+    if(listingType==="sale"){basePrice=Math.round(sqft*getPricePerSqft(area,propType)/1000)*1000}
+    else{basePrice=Math.round(sqft*getPricePerSqft(area,propType)*(0.06+rng()*0.03)/100)*100}
 
-// FAQ accordion
-const faqs = [
-  { q: "How do I know if I have a moth infestation?", a: "Common signs include small holes in clothing or fabrics, bare patches on carpets (especially under furniture), tiny caterpillar-like larvae, silky webbing or cocoon casings, and adult moths flying around your home. If you spot any of these, contact us for a free survey." },
-  { q: "How much does moth treatment cost in London?", a: "Treatment costs depend on the severity of the infestation, property size, and treatment method required. A standard residential treatment typically starts from around \u00a3150-\u00a3300. We always provide a free survey and transparent quote before any work begins - no hidden costs." },
-  { q: "Is the treatment safe for children and pets?", a: "Yes. We use products that are approved for domestic use and follow strict safety protocols. For families with young children or pets, we also offer a completely chemical-free heat treatment option. Our technicians will advise on any precautions needed." },
-  { q: "How long does moth treatment take?", a: "Most residential treatments are completed in 2-4 hours depending on property size. Heat treatments may take 6-8 hours. You can typically return to normal use of your home the same day, though we'll advise on any specific waiting periods." },
-  { q: "Do you offer a guarantee on your treatments?", a: "Yes, all our moth treatments come with a 12-month guarantee. If moths return within the guarantee period, we'll re-treat your property at no extra cost. This gives you complete peace of mind that the problem is truly resolved." },
-  { q: "What moth species are common in London?", a: "The most common species we treat in London are the Common Clothes Moth (Tineola bisselliella), Case-bearing Clothes Moth (Tinea pellionella), and the Brown House Moth (Hofmannophila pseudospretella). We also deal with Indian Meal Moths in kitchens and pantries." },
-  { q: "Can I treat moths myself with shop-bought products?", a: "While shop-bought sprays and traps can help with very minor issues, they rarely resolve an established infestation. Professional treatment targets all life stages (eggs, larvae, pupae, and adults) and reaches hidden areas that DIY products cannot. We strongly recommend professional treatment for any persistent moth problem." },
-];
-document.getElementById('faq-list').innerHTML = faqs.map(f => `<div class="border-b border-gray-200"><button onclick="this.nextElementSibling.classList.toggle('hidden');this.querySelector('svg').classList.toggle('rotate-180')" class="flex w-full items-center justify-between py-5 text-left"><span class="text-base font-semibold text-foreground pr-4">${f.q}</span><svg class="h-5 w-5 flex-shrink-0 text-muted transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></button><div class="hidden pb-5 text-sm text-muted leading-relaxed">${f.a}</div></div>`).join('');
+    const daysHist=60+Math.floor(rng()*30);
+    const snapshots=[];const changes=[];
+    let price=basePrice;
+    const start=new Date();start.setDate(start.getDate()-daysHist);
+    for(let d=0;d<=daysHist;d+=3+Math.floor(rng()*4)){
+      const dt=new Date(start);dt.setDate(dt.getDate()+d);
+      snapshots.push({price,date:dt.toISOString().slice(0,10)});
+      if(rng()<.15&&d>0){
+        const old=price;const pct=(rng()-.45)*10;
+        price=Math.round(price*(1+pct/100)/100)*100;
+        changes.push({oldPrice:old,newPrice:price,amount:price-old,pct:Math.round((price-old)/old*10000)/100,date:dt.toISOString().slice(0,10)});
+      }
+    }
+    const slug=area.toLowerCase().replace(/\s+/g,"-");
+    properties.push({
+      id:pid++,title:`${beds===0?"Studio":beds+" BR"} ${propType} in ${area}`,
+      location:`${area}, Dubai`,area,beds,baths,sqft,propType,listingType,
+      price,currency:"AED",snapshots,changes,
+      url:`https://www.propertyfinder.ae/en/plp/${listingType}/${slug}/property-${i}.html`,
+      firstSeen:snapshots[0]?.date||"",lastUpdated:snapshots[snapshots.length-1]?.date||""
+    });
+  }
+}
+genListings("sale",80);genListings("rent",60);
+
+// ==================== HELPERS ====================
+function fmt(n,c="AED"){if(n>=1e6)return c+" "+(n/1e6).toFixed(2)+"M";if(n>=1e3)return c+" "+(n/1e3).toFixed(0)+"K";return c+" "+n.toLocaleString()}
+function fmtExact(n,c="AED"){return c+" "+Math.round(n).toLocaleString()}
+function fmtChg(p){return(p>0?"+":"")+p.toFixed(2)+"%"}
+function fmtDate(d){const dt=new Date(d);return dt.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}
+function timeAgo(d){const ms=Date.now()-new Date(d).getTime();const days=Math.floor(ms/864e5);if(days<1)return"today";if(days<7)return days+"d ago";if(days<30)return Math.floor(days/7)+"w ago";return fmtDate(d)}
+
+// ==================== NAVIGATION ====================
+let currentPage='dashboard';
+function showPage(name,detailId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const navEl=document.getElementById('nav-'+name);if(navEl)navEl.classList.add('active');
+  currentPage=name;
+  if(name==='detail'&&detailId)renderDetail(detailId);
+  if(name==='properties')renderProperties();
+  if(name==='trends')renderTrends();
+}
+function showDetail(id){showPage('detail',id)}
+
+// ==================== DASHBOARD ====================
+function renderDashboard(){
+  // Area charts
+  const saleByArea={},rentByArea={};
+  properties.forEach(p=>{
+    if(p.listingType==='sale'){saleByArea[p.area]=(saleByArea[p.area]||[]);saleByArea[p.area].push(p.price)}
+    else{rentByArea[p.area]=(rentByArea[p.area]||[]);rentByArea[p.area].push(p.price)}
+  });
+  const saleAreas=Object.entries(saleByArea).map(([a,ps])=>({area:a,avg:ps.reduce((s,v)=>s+v,0)/ps.length})).sort((a,b)=>b.avg-a.avg);
+  const rentAreas=Object.entries(rentByArea).map(([a,ps])=>({area:a,avg:ps.reduce((s,v)=>s+v,0)/ps.length})).sort((a,b)=>b.avg-a.avg);
+
+  createBarChart('chart-area-sale',saleAreas.map(a=>a.area.length>13?a.area.slice(0,11)+"..":a.area),saleAreas.map(a=>Math.round(a.avg)),'Avg Price');
+  createBarChart('chart-area-rent',rentAreas.map(a=>a.area.length>13?a.area.slice(0,11)+"..":a.area),rentAreas.map(a=>Math.round(a.avg)),'Avg Price');
+
+  // Trends
+  const saleWeeks={},rentWeeks={};
+  properties.forEach(p=>{
+    p.snapshots.forEach(s=>{
+      const w=s.date.slice(0,7);
+      if(p.listingType==='sale'){saleWeeks[w]=(saleWeeks[w]||[]);saleWeeks[w].push(s.price)}
+      else{rentWeeks[w]=(rentWeeks[w]||[]);rentWeeks[w].push(s.price)}
+    });
+  });
+  const saleTrend=Object.entries(saleWeeks).sort((a,b)=>a[0].localeCompare(b[0])).map(([w,ps])=>({w,avg:ps.reduce((s,v)=>s+v,0)/ps.length}));
+  const rentTrend=Object.entries(rentWeeks).sort((a,b)=>a[0].localeCompare(b[0])).map(([w,ps])=>({w,avg:ps.reduce((s,v)=>s+v,0)/ps.length}));
+
+  createLineChart('chart-sale-trend',saleTrend.map(t=>t.w),saleTrend.map(t=>Math.round(t.avg)),'Average');
+  createLineChart('chart-rent-trend',rentTrend.map(t=>t.w),rentTrend.map(t=>Math.round(t.avg)),'Average');
+
+  // Recent changes
+  const allChanges=[];
+  properties.forEach(p=>{p.changes.forEach(c=>{allChanges.push({...c,title:p.title,area:p.area,listingType:p.listingType,pid:p.id})})});
+  allChanges.sort((a,b)=>b.date.localeCompare(a.date));
+
+  const tbody=document.getElementById('recent-changes-body');
+  tbody.innerHTML=allChanges.slice(0,15).map(c=>`<tr>
+    <td><a href="#" onclick="showDetail(${c.pid})">${c.title}</a></td>
+    <td style="color:var(--muted)">${c.area}</td>
+    <td><span class="badge badge-${c.listingType}">${c.listingType}</span></td>
+    <td class="text-right mono" style="color:var(--muted)">${fmtExact(c.oldPrice)}</td>
+    <td class="text-right mono" style="font-weight:600">${fmtExact(c.newPrice)}</td>
+    <td class="text-right mono ${c.pct>0?'change-up':'change-down'}" style="font-weight:600">${c.pct>0?'&#8599;':'&#8600;'} ${fmtChg(c.pct)}</td>
+    <td class="text-right" style="color:var(--muted)">${timeAgo(c.date)}</td>
+  </tr>`).join('');
+
+  // Top drops & increases
+  const drops=allChanges.filter(c=>c.pct<0).sort((a,b)=>a.pct-b.pct).slice(0,8);
+  const increases=allChanges.filter(c=>c.pct>0).sort((a,b)=>b.pct-a.pct).slice(0,8);
+
+  document.getElementById('top-drops-body').innerHTML=drops.map(c=>`<tr>
+    <td><a href="#" onclick="showDetail(${c.pid})">${c.title}</a></td>
+    <td style="color:var(--muted)">${c.area}</td>
+    <td class="text-right mono change-down" style="font-weight:600">${fmtChg(c.pct)}</td>
+  </tr>`).join('');
+
+  document.getElementById('top-increases-body').innerHTML=increases.map(c=>`<tr>
+    <td><a href="#" onclick="showDetail(${c.pid})">${c.title}</a></td>
+    <td style="color:var(--muted)">${c.area}</td>
+    <td class="text-right mono change-up" style="font-weight:600">${fmtChg(c.pct)}</td>
+  </tr>`).join('');
+}
+
+// ==================== PROPERTIES ====================
+let propSort='updated',propOrder='desc',propPage=1;
+function filterProperties(){propPage=1;renderProperties()}
+function sortProperties(field){if(propSort===field)propOrder=propOrder==='desc'?'asc':'desc';else{propSort=field;propOrder='desc'}propPage=1;renderProperties()}
+
+function renderProperties(){
+  const search=(document.getElementById('search-input').value||'').toLowerCase();
+  const lt=document.getElementById('filter-listing').value;
+  const fa=document.getElementById('filter-area').value;
+  const ft=document.getElementById('filter-proptype').value;
+  const fb=document.getElementById('filter-beds').value;
+
+  let filtered=properties.filter(p=>{
+    if(search&&!p.title.toLowerCase().includes(search)&&!p.area.toLowerCase().includes(search))return false;
+    if(lt&&p.listingType!==lt)return false;
+    if(fa&&p.area!==fa)return false;
+    if(ft&&p.propType!==ft)return false;
+    if(fb!==''&&p.beds<parseInt(fb))return false;
+    return true;
+  });
+
+  filtered.sort((a,b)=>{
+    let va,vb;
+    if(propSort==='price'){va=a.price;vb=b.price}
+    else if(propSort==='area_sqft'){va=a.sqft;vb=b.sqft}
+    else{va=a.lastUpdated;vb=b.lastUpdated}
+    if(va<vb)return propOrder==='asc'?-1:1;
+    if(va>vb)return propOrder==='asc'?1:-1;
+    return 0;
+  });
+
+  document.getElementById('prop-count').textContent=`(${filtered.length} total)`;
+  const perPage=20,pages=Math.ceil(filtered.length/perPage);
+  const slice=filtered.slice((propPage-1)*perPage,propPage*perPage);
+
+  document.getElementById('properties-body').innerHTML=slice.map(p=>{
+    const lastChange=p.changes.length>0?p.changes[p.changes.length-1]:null;
+    return`<tr>
+      <td><a href="#" onclick="showDetail(${p.id})">${p.title}</a></td>
+      <td style="color:var(--muted)">${p.area}</td>
+      <td><span class="badge badge-${p.listingType}">${p.listingType}</span></td>
+      <td style="text-align:center">${p.beds===0?'S':p.beds}</td>
+      <td class="text-right" style="color:var(--muted)">${p.sqft>0?p.sqft.toLocaleString()+' sqft':'-'}</td>
+      <td class="text-right mono" style="font-weight:600">${fmtExact(p.price)}</td>
+      <td class="text-right">${lastChange?`<span class="mono ${lastChange.pct>0?'change-up':'change-down'}" style="font-weight:600">${fmtChg(lastChange.pct)}</span>`:'<span style="color:var(--muted)">-</span>'}</td>
+      <td class="text-right" style="color:var(--muted)">${timeAgo(p.lastUpdated)}</td>
+    </tr>`}).join('');
+
+  // Pagination
+  let pagHtml=`<div class="info">Page ${propPage} of ${pages||1}</div><div class="page-btns">`;
+  pagHtml+=`<button class="page-btn" ${propPage<=1?'disabled':''} onclick="propPage--;renderProperties()">Prev</button>`;
+  const start=Math.max(1,Math.min(propPage-2,pages-4));
+  for(let i=start;i<=Math.min(start+4,pages);i++){
+    pagHtml+=`<button class="page-btn ${i===propPage?'active':''}" onclick="propPage=${i};renderProperties()">${i}</button>`;
+  }
+  pagHtml+=`<button class="page-btn" ${propPage>=pages?'disabled':''} onclick="propPage++;renderProperties()">Next</button></div>`;
+  document.getElementById('pagination').innerHTML=pagHtml;
+}
+
+// ==================== PROPERTY DETAIL ====================
+let detailChart=null;
+function renderDetail(id){
+  const p=properties.find(x=>x.id===id);if(!p)return;
+  document.getElementById('detail-breadcrumb').textContent=p.title;
+  document.getElementById('detail-title').textContent=p.title;
+  document.getElementById('detail-location').textContent=p.location;
+  document.getElementById('detail-price').textContent=fmtExact(p.price);
+
+  const firstPrice=p.snapshots[0]?.price||p.price;
+  const totalChange=p.price-firstPrice;
+  const totalPct=firstPrice>0?Math.round(totalChange/firstPrice*10000)/100:0;
+  const changeEl=document.getElementById('detail-change');
+  if(totalChange!==0){
+    changeEl.className='detail-change '+(totalChange>0?'change-up':'change-down');
+    changeEl.textContent=`${totalChange>0?'+':''}${fmtExact(totalChange)} (${fmtChg(totalPct)}) since tracked`;
+  }else changeEl.textContent='';
+
+  document.getElementById('detail-tracked').textContent='Tracked since '+fmtDate(p.firstSeen);
+  document.getElementById('detail-psf').textContent=p.sqft>0?fmtExact(Math.round(p.price/p.sqft))+' / sqft':'';
+  document.getElementById('detail-link').href=p.url;
+
+  let tagsHtml=`<span class="badge badge-${p.listingType}">For ${p.listingType==='sale'?'Sale':'Rent'}</span>`;
+  tagsHtml+=`<div class="detail-tag">${p.propType}</div>`;
+  if(p.beds>0)tagsHtml+=`<span style="font-size:13px;color:var(--muted)">${p.beds} bed${p.beds>1?'s':''}</span>`;
+  if(p.baths>0)tagsHtml+=`<span style="font-size:13px;color:var(--muted)">${p.baths} bath${p.baths>1?'s':''}</span>`;
+  if(p.sqft>0)tagsHtml+=`<span style="font-size:13px;color:var(--muted)">${p.sqft.toLocaleString()} sqft</span>`;
+  document.getElementById('detail-tags').innerHTML=tagsHtml;
+
+  const prices=p.snapshots.map(s=>s.price);
+  const minP=Math.min(...prices),maxP=Math.max(...prices);
+  document.getElementById('detail-mini-stats').innerHTML=`
+    <div class="mini-stat"><div class="label">Price Changes</div><div class="value">${p.changes.length}</div></div>
+    <div class="mini-stat"><div class="label">Lowest Price</div><div class="value" style="color:var(--accent)">${fmtExact(minP)}</div></div>
+    <div class="mini-stat"><div class="label">Highest Price</div><div class="value" style="color:var(--danger)">${fmtExact(maxP)}</div></div>
+    <div class="mini-stat"><div class="label">Total Change</div><div class="value ${totalPct>0?'change-up':totalPct<0?'change-down':''}">${fmtChg(totalPct)}</div></div>`;
+
+  // Price chart
+  if(detailChart)detailChart.destroy();
+  const ctx=document.getElementById('chart-detail-price').getContext('2d');
+  detailChart=new Chart(ctx,{type:'line',data:{labels:p.snapshots.map(s=>s.date.slice(5)),datasets:[{label:'Price',data:p.snapshots.map(s=>s.price),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'#3b82f6'}]},options:{...chartOpts(),plugins:{...chartOpts().plugins,tooltip:{callbacks:{label:ctx=>fmtExact(ctx.raw)}}}}});
+
+  // Changes table
+  document.getElementById('detail-changes-body').innerHTML=p.changes.slice().reverse().map(c=>`<tr>
+    <td style="color:var(--muted)">${fmtDate(c.date)}</td>
+    <td class="text-right mono">${fmtExact(c.oldPrice)}</td>
+    <td class="text-right mono" style="font-weight:600">${fmtExact(c.newPrice)}</td>
+    <td class="text-right mono ${c.amount>0?'change-up':'change-down'}" style="font-weight:600">${c.amount>0?'+':''}${fmtExact(c.amount)}</td>
+    <td class="text-right mono ${c.pct>0?'change-up':'change-down'}" style="font-weight:600">${fmtChg(c.pct)}</td>
+  </tr>`).join('');
+}
+
+// ==================== TRENDS ====================
+let trendType='sale';
+let trendCharts=[];
+function setTrendType(t){
+  trendType=t;
+  document.querySelectorAll('#trend-type-toggle button').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderTrends();
+}
+
+function renderTrends(){
+  trendCharts.forEach(c=>c.destroy());trendCharts=[];
+
+  const filtered=properties.filter(p=>p.listingType===trendType);
+  // Price trend
+  const weekData={};
+  filtered.forEach(p=>p.snapshots.forEach(s=>{const w=s.date.slice(0,7);weekData[w]=(weekData[w]||[]);weekData[w].push(s.price)}));
+  const trend=Object.entries(weekData).sort((a,b)=>a[0].localeCompare(b[0])).map(([w,ps])=>({w,avg:ps.reduce((s,v)=>s+v,0)/ps.length}));
+  trendCharts.push(createLineChart('chart-trend-main',trend.map(t=>t.w),trend.map(t=>Math.round(t.avg)),'Average'));
+
+  // By area
+  const byArea={};filtered.forEach(p=>{byArea[p.area]=(byArea[p.area]||[]);byArea[p.area].push(p)});
+  const areaData=Object.entries(byArea).map(([a,ps])=>({area:a,avg:ps.reduce((s,p)=>s+p.price,0)/ps.length,count:ps.length,avgSqft:ps.reduce((s,p)=>s+p.sqft,0)/ps.length,psf:ps.filter(p=>p.sqft>0).length>0?ps.filter(p=>p.sqft>0).reduce((s,p)=>s+p.price/p.sqft,0)/ps.filter(p=>p.sqft>0).length:0})).sort((a,b)=>b.avg-a.avg);
+
+  trendCharts.push(createBarChart('chart-trend-area',areaData.map(a=>a.area.length>13?a.area.slice(0,11)+'..':a.area),areaData.map(a=>Math.round(a.avg)),'Avg Price'));
+  const sqftData=areaData.filter(a=>a.psf>0).sort((a,b)=>b.psf-a.psf);
+  trendCharts.push(createBarChart('chart-trend-sqft',sqftData.map(a=>a.area.length>13?a.area.slice(0,11)+'..':a.area),sqftData.map(a=>Math.round(a.psf)),'AED/sqft'));
+
+  // By bedrooms
+  const byBeds={};filtered.forEach(p=>{const k=p.beds===0?'Studio':p.beds+' BR';byBeds[k]=(byBeds[k]||[]);byBeds[k].push(p)});
+  const bedData=Object.entries(byBeds).sort((a,b)=>{const an=a[0]==='Studio'?0:parseInt(a[0]);const bn=b[0]==='Studio'?0:parseInt(b[0]);return an-bn}).map(([k,ps])=>({k,avg:ps.reduce((s,p)=>s+p.price,0)/ps.length}));
+  trendCharts.push(createBarChart('chart-trend-beds',bedData.map(d=>d.k),bedData.map(d=>Math.round(d.avg)),'Avg Price'));
+
+  // By type
+  const byType={};filtered.forEach(p=>{byType[p.propType]=(byType[p.propType]||[]);byType[p.propType].push(p)});
+  const typeData=Object.entries(byType).map(([k,ps])=>({k,avg:ps.reduce((s,p)=>s+p.price,0)/ps.length})).sort((a,b)=>b.avg-a.avg);
+  trendCharts.push(createBarChart('chart-trend-type',typeData.map(d=>d.k),typeData.map(d=>Math.round(d.avg)),'Avg Price'));
+
+  // Area comparison table
+  document.getElementById('area-comparison-body').innerHTML=areaData.map(a=>`<tr>
+    <td style="font-weight:600">${a.area}</td>
+    <td class="text-right" style="color:var(--muted)">${a.count}</td>
+    <td class="text-right mono">${fmt(a.avg)}</td>
+    <td class="text-right" style="color:var(--muted)">${a.avgSqft>0?Math.round(a.avgSqft).toLocaleString()+' sqft':'-'}</td>
+    <td class="text-right mono" style="font-weight:600">${a.psf>0?'AED '+Math.round(a.psf).toLocaleString():'-'}</td>
+  </tr>`).join('');
+}
+
+// ==================== CHART HELPERS ====================
+function chartOpts(){
+  return{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#94a3b8',font:{size:10},maxRotation:45},grid:{color:'#334155'}},y:{ticks:{color:'#94a3b8',font:{size:10},callback:v=>fmt(v)},grid:{color:'#334155'}}}}
+}
+
+function createBarChart(id,labels,data,label){
+  const ctx=document.getElementById(id).getContext('2d');
+  return new Chart(ctx,{type:'bar',data:{labels,datasets:[{label,data,backgroundColor:labels.map((_,i)=>COLORS[i%COLORS.length]),borderRadius:4}]},options:{...chartOpts(),plugins:{...chartOpts().plugins,tooltip:{callbacks:{label:ctx=>fmt(ctx.raw)}}}}});
+}
+
+function createLineChart(id,labels,data,label){
+  const ctx=document.getElementById(id).getContext('2d');
+  return new Chart(ctx,{type:'line',data:{labels,datasets:[{label,data,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:.3,pointRadius:2}]},options:{...chartOpts(),plugins:{...chartOpts().plugins,tooltip:{callbacks:{label:ctx=>fmt(ctx.raw)}}}}});
+}
+
+// ==================== INIT ====================
+// Populate area filter
+const areaSelect=document.getElementById('filter-area');
+AREAS.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;areaSelect.appendChild(o)});
+
+renderDashboard();
 </script>
 </body>
 </html>
