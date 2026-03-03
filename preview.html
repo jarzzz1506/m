@@ -184,7 +184,7 @@ select:focus,input:focus{border-color:var(--primary)}
   <div class="table-card">
     <div class="table-header"><h3>Recent Price Changes</h3></div>
     <table>
-      <thead><tr><th>Property</th><th>Area</th><th>Type</th><th class="text-right">Old Price</th><th class="text-right">New Price</th><th class="text-right">Change</th><th class="text-right">When</th></tr></thead>
+      <thead><tr><th>Property</th><th>Unit</th><th>Area</th><th>Type</th><th class="text-right">Old Price</th><th class="text-right">New Price</th><th class="text-right">Change</th><th class="text-right">When</th></tr></thead>
       <tbody id="recent-changes-body"></tbody>
     </table>
   </div>
@@ -233,7 +233,7 @@ select:focus,input:focus{border-color:var(--primary)}
   <div class="table-card">
     <table>
       <thead><tr>
-        <th>Property</th><th>Area</th><th>Type</th><th>Beds</th>
+        <th>Property</th><th>Unit</th><th>Area</th><th>Type</th><th>Beds</th>
         <th class="text-right" style="cursor:pointer" onclick="sortProperties('area_sqft')">Size</th>
         <th class="text-right" style="cursor:pointer" onclick="sortProperties('price')">Price</th>
         <th class="text-right">Change</th>
@@ -334,10 +334,17 @@ function getPricePerSqft(area,type){
 // Generate properties
 const properties=[];
 let pid=1;
+function genUnitNo(propType,rng){
+  if(propType==="Villa")return"V"+String(100+Math.floor(rng()*900));
+  if(propType==="Townhouse")return"TH-"+String(10+Math.floor(rng()*90));
+  const floor=Math.floor(rng()*45)+1;const unit=Math.floor(rng()*12)+1;
+  return String(floor)+String(unit).padStart(2,'0');
+}
 function genListings(listingType,count){
   for(let i=0;i<count;i++){
     const area=AREAS[Math.floor(rng()*AREAS.length)];
     const propType=PROP_TYPES[Math.floor(rng()*PROP_TYPES.length)];
+    const unitNo=genUnitNo(propType,rng);
     const beds=propType==="Studio"?0:Math.floor(rng()*5)+1;
     const baths=Math.max(1,beds);
     const sqft=propType==="Villa"?2000+Math.floor(rng()*5000):propType==="Penthouse"?2500+Math.floor(rng()*3000):propType==="Studio"?350+Math.floor(rng()*250):600+Math.floor(rng()*2000);
@@ -360,7 +367,7 @@ function genListings(listingType,count){
     }
     const slug=area.toLowerCase().replace(/\s+/g,"-");
     properties.push({
-      id:pid++,title:`${beds===0?"Studio":beds+" BR"} ${propType} in ${area}`,
+      id:pid++,unitNo,title:`Unit ${unitNo} - ${beds===0?"Studio":beds+" BR"} ${propType} in ${area}`,
       location:`${area}, Dubai`,area,beds,baths,sqft,propType,listingType,
       price,currency:"AED",snapshots,changes,
       url:`https://www.propertyfinder.ae/en/plp/${listingType}/${slug}/property-${i}.html`,
@@ -422,12 +429,13 @@ function renderDashboard(){
 
   // Recent changes
   const allChanges=[];
-  properties.forEach(p=>{p.changes.forEach(c=>{allChanges.push({...c,title:p.title,area:p.area,listingType:p.listingType,pid:p.id})})});
+  properties.forEach(p=>{p.changes.forEach(c=>{allChanges.push({...c,title:p.title,unitNo:p.unitNo,area:p.area,listingType:p.listingType,pid:p.id})})});
   allChanges.sort((a,b)=>b.date.localeCompare(a.date));
 
   const tbody=document.getElementById('recent-changes-body');
   tbody.innerHTML=allChanges.slice(0,15).map(c=>`<tr>
     <td><a href="#" onclick="showDetail(${c.pid})">${c.title}</a></td>
+    <td class="mono" style="color:var(--muted)">${c.unitNo}</td>
     <td style="color:var(--muted)">${c.area}</td>
     <td><span class="badge badge-${c.listingType}">${c.listingType}</span></td>
     <td class="text-right mono" style="color:var(--muted)">${fmtExact(c.oldPrice)}</td>
@@ -466,7 +474,7 @@ function renderProperties(){
   const fb=document.getElementById('filter-beds').value;
 
   let filtered=properties.filter(p=>{
-    if(search&&!p.title.toLowerCase().includes(search)&&!p.area.toLowerCase().includes(search))return false;
+    if(search&&!p.title.toLowerCase().includes(search)&&!p.area.toLowerCase().includes(search)&&!p.unitNo.toLowerCase().includes(search))return false;
     if(lt&&p.listingType!==lt)return false;
     if(fa&&p.area!==fa)return false;
     if(ft&&p.propType!==ft)return false;
@@ -492,6 +500,7 @@ function renderProperties(){
     const lastChange=p.changes.length>0?p.changes[p.changes.length-1]:null;
     return`<tr>
       <td><a href="#" onclick="showDetail(${p.id})">${p.title}</a></td>
+      <td class="mono" style="color:var(--muted)">${p.unitNo}</td>
       <td style="color:var(--muted)">${p.area}</td>
       <td><span class="badge badge-${p.listingType}">${p.listingType}</span></td>
       <td style="text-align:center">${p.beds===0?'S':p.beds}</td>
@@ -518,7 +527,7 @@ function renderDetail(id){
   const p=properties.find(x=>x.id===id);if(!p)return;
   document.getElementById('detail-breadcrumb').textContent=p.title;
   document.getElementById('detail-title').textContent=p.title;
-  document.getElementById('detail-location').textContent=p.location;
+  document.getElementById('detail-location').textContent='Unit '+p.unitNo+' \u2022 '+p.location;
   document.getElementById('detail-price').textContent=fmtExact(p.price);
 
   const firstPrice=p.snapshots[0]?.price||p.price;
