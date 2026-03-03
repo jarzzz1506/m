@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Sidebar from "@/components/Sidebar";
 
 export const metadata: Metadata = {
-  title: "MothGuard London | Professional Moth Treatment & Prevention",
+  title: "PropertyPulse | Dubai Property Price Monitor",
   description:
-    "London's leading moth treatment specialists. Expert carpet moth, clothes moth & pantry moth removal. BPCA certified. Same-day service available across all London boroughs.",
-  keywords:
-    "moth treatment London, moth pest control, carpet moth removal, clothes moth treatment, moth fumigation, moth prevention London",
+    "Track property price changes and trends from propertyfinder.ae. Monitor Dubai real estate prices, analyze market trends, and spot opportunities.",
 };
 
 export default function RootLayout({
@@ -16,7 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased flex min-h-screen">
+        <Sidebar />
+        <main className="flex-1 ml-64 p-8 overflow-auto">{children}</main>
+      </body>
     </html>
   );
 }
