@@ -129,6 +129,7 @@ function seedIfEmpty(db: Database.Database) {
         listing.title,
         listing.location,
         listing.area,
+        "Dubai",
         listing.bedrooms,
         listing.bathrooms,
         listing.areaSqft,
